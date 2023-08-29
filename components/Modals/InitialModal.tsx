@@ -1,5 +1,6 @@
 "use client";
 import * as z from "zod";
+import axios from 'axios'
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -22,6 +23,9 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import FileUpload from "@/components/FileUpload";
+import { useRouter } from "next/navigation";
 
 // schema to validate the server modal forms
 const formSchema = z.object({
@@ -36,6 +40,18 @@ const formSchema = z.object({
 // the start of function component initial modal
 
 const InitialModal = () => {
+
+
+  const router = useRouter()
+
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+
+  }, [])
+
+
   // initializing the forms
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -48,8 +64,22 @@ const InitialModal = () => {
   const isLoading = form.formState.isLoading;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    try {
+      await axios.post("/api/servers", values)
+      form.reset()
+      router.refresh()
+      window.location.reload()
+
+    } catch (error) {
+      console.log(error);
+
+
+    }
   };
+
+  if (!isMounted) {
+    return null
+  }
   return (
     <Dialog open>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
@@ -66,7 +96,18 @@ const InitialModal = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 ">
             <div className="space-y-8 px-6">
               <div className="flex items-center justify-center text-center">
-                Todo: image upload
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <FileUpload endpoint="serverImage" value={field.value} onChange={field.onChange} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               <FormField
                 control={form.control}
@@ -84,7 +125,7 @@ const InitialModal = () => {
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage /> 
+                    <FormMessage />
                   </FormItem>
                 )}
               />
