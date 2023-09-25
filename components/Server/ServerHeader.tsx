@@ -19,6 +19,7 @@ import {
   Users,
 } from "lucide-react";
 import { useModal } from "@/Hooks/useModalStore";
+import { useRouter } from "next/navigation";
 
 interface ServerHeaderProps {
   server: ServerWithMembersWithProfile;

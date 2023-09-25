@@ -1,6 +1,5 @@
 import CurrentProfile from "@/lib/CurrentProfile";
 import { db } from "@/lib/db";
-import { currentUser } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
